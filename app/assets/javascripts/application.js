@@ -14,3 +14,14 @@
 //= require jquery_ujs
 // require turbolinks
 //= require_tree .
+
+$(document).ready(function(){
+	$('.select_all_user_roles').change(function() {
+	    var checkboxes = $(this).closest('.select-user-roles').find(':checkbox');
+	    if($(this).is(':checked')) {
+	        checkboxes.prop('checked', true);
+	    } else {
+	        checkboxes.prop('checked', false);
+	    }
+	});
+});

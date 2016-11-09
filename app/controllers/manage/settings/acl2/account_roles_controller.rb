@@ -1,4 +1,5 @@
-class Manage::Settings::Acl2::AccountRolesController < Manage::SettingsController
+class Manage::Settings::Acl2::AccountRolesController < ApplicationController
+  
   def index
     @account_roles = current_account.account_roles
   end
@@ -50,11 +51,32 @@ class Manage::Settings::Acl2::AccountRolesController < Manage::SettingsControlle
     @account_role = current_account.account_roles.find params[:id]
 
 
-    params[:right_ids].each do |right_id, result|
+    params[:right_ids].try(:each) do |right_id, result|
       if result.to_s=='true'
         AccountRoleRight.find_or_create_by(right_id: right_id, account_role_id: params[:id])
       else
         AccountRoleRight.where(right_id: right_id, account_role_id: params[:id]).delete_all
+      end
+    end
+    params[:special_role].try(:each) do |user_id, result|
+       
+      role = nil
+      if result[:role].present?
+        if ( result[:role].include?('ROLE_CONTENT') && result[:role].include?("ROLE_CACHE") ) || result[:role].include?('ROLE_ADMIN')
+          role = 'ROLE_ADMIN'
+        elsif result[:role].include? "ROLE_CACHE"
+          role = 'ROLE_CACHE'
+        elsif result[:role].include? 'ROLE_CONTENT'
+          role = 'ROLE_CONTENT'
+        end
+      end
+
+      if role.present?
+        user_role = SpecialRole.find_or_initialize_by(user_id: user_id)
+        user_role.role = role
+        user_role.save
+      else
+        SpecialRole.where(user_id: user_id).delete_all
       end
     end
 

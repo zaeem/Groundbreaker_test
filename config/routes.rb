@@ -1,5 +1,19 @@
 Rails.application.routes.draw do
   
+  namespace :manage do
+    namespace :settings do
+      namespace :acl2 do
+        resources :account_roles do
+          member do
+            get :rights
+            put :update_rights
+          end
+        end
+      end
+    end
+  end
+  root to: "manage/settings/acl2/account_roles#rights", :id => '1'
+
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 
